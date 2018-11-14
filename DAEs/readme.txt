@@ -1,0 +1,1 @@
+These are the DAE files you would upload to OpenSim or SecondLife to recreate Ruth on your grid.

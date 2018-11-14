@@ -1,0 +1,78 @@
+License terms for this project vary by part type.  Please do not delete any credits or license files that are included in this project.   Built with Blender 2.79 with Avastar 2.3-2 Bento and Avastar 2.4-1 Bento.
+
+Ruth Too is derived from Ruth 2.0 RC3. All licensing is the same as Ruth 2.0.
+
+Ruth Too is created by Sean Heavy from a modified Ruth 2.0 RC3. The Ruth Too body has the same mesh and weight painting as Ruth Too RC3; so all Ruth 2.0 RC3 clothing and add-ons should fit the same.
+
+Ruth 2.0 is by Shin Ingen, who can be found at https://mewe.com/i/shiningen 
+
+Ruth Too is by Sean Heavy who can be found at these social media sites:
+https://mewe.com/i/seanheavy
+https://plus.google.com/105693193051691369796
+https://twitter.com/SeanHeavy
+
+mailto:seanheavy@gmail.com
+
+Most of the these mesh objects can be downloaded from GitHub at:
+https://github.com/ocsean/Ruth
+or
+https://github.com/ingen-lab/Ruth
+
+The following mesh body parts are AGPL.
+Upper Body
+Lower Body
+Bento Hands
+Flat Feet
+Medium Feet
+High Feet
+
+Fingernails & Toenails have Virtual World License by Sundance Haiku
+
+The mesh head is CC-BY Linden Lab.
+
+The UV map is CC-BY Linden Lab.
+
+Various Authors and contributors to the original Ruth Git Repo in alphabetical order are:
+Ada Radius
+Ai Austin
+Chimera Firecaster
+Elenia Boucher
+Fred Beckhusen
+Fritigern Gothly
+Joe Builder
+Lelani Carver
+Leona Morro
+Mike Dickson
+Noxluna Nightfire
+Shin Ingen
+Sundance Haiku
+
+The mesh head is CC-BY Linden Lab.
+The UV map is CC-BY Linden Lab.
+
+Ruth Too Logo and photos CC-0 by Sean Heavy.
+
+**Skins**
+
+Skin templates by Chip Midnight:  http://forums-archive.secondlife.com/109/72/40762/1.html
+
+CMFF Templates are Licensed as CC-BY 3.0 by Chip Midnight. 
+
+Splendor Skin by Sezmra Svarog, (Laurie Ellis) is free to use and Non Commercial.
+
+Splendor Skin Mods by Lelani Carver - LelaniCarverSplendorTan is free to use and Non Commercial.
+
+Pleaides Skin by Eloh Eliot is BSD License--this covers both source files and in-world skins.
+
+StarLight Skin, Strawberry Mods by Eloh Eliot is MIT License--this covers both source files and in-world skins.
+
+Ghana Skin is CC-BY Ina Centaur. 
+
+**Attachments**
+
+...
+
+**Clothing**
+
+...
+

@@ -1,0 +1,43 @@
+Ruth_Too_RC3_Release_Notes.txt
+
+These are primarily Ruth 2.0 release notes that also apply to Ruth Too RC3
+
+===================
+###Ruth RC#3 Release Notes###
+===================
+
+Ruth Too RC3 is not compatible with Ruth 2.0 RC#2 and parts are not interchangeable.
+
+Ruth Too RC3 body parts are compatible with Ruth 2.0 RC#3, not HUDs; all body parts are interchangeable. You should only use Ruth Too RC3 HUDs with Ruth Too RC3 body parts. And you should only use Ruth 2.0 HUDs with Ruth 2.0 body parts.
+
+Ruth Too Hands, Feet and Head should be compatible with all Ruth HUDs
+
+This release includes a second box called "Ruth 2.0 Extras"
+--ru2xAdaFEET_flatFX_RC#3 by Ada Radius
+--ru2xCuriousFEET_high_RC#3 by Curious Creator
+--ru2xSundanceFEET_high_RC#3 by Sundance Haiku
+--Hand pose HUD by Chimera Firecaster
+
+
+Ruth 2.0 Also applies to Ruth Too:
+Fixes and tweaks for the following:
+--Feet and hands are now part of the alpha hud.
+--Upper & Lower body UV map improvements and mesh symmetries by Sundance Haiku and Curiuos Creator.
+--New flat, medium, and high feet by Taarna Wells (new UV maps and vertex weights).
+--toenails for each feet type with improved UV map by Taarna Wells.
+--Ada's poseable flat feet also received a new UV map by Sundance Haiku.
+--Curious high feet weighted to mKnee for a no ankle lock feature. New UV map.
+--Sundance high feet with legacy vertex weight(RC#2). New UV map.
+--For more detailed improvement information about Ruth 2.0, please read the readme.txt included with each file at the Ruth 2.0 Github Repository, (https://github.com/ingen-lab/Ruth).
+
+====================
+Neck Seam or Neck Break problem? 
+Please read this https://plus.google.com/u/0/+ShinIngen/posts/8fo7ko8xFge
+====================
+Foot skin problems? For best result, paint over the system toenails and remove as much detail as you can from your foot skin that is probably designed for the system avatar's duck feet.
+
+
+Ruth 2.0 Project Repository: https://github.com/ingen-lab/Ruth/wiki
+==============================================
+Ruth Too RC3 Project Repository: https://github.com/ocsean/Ruth
+
