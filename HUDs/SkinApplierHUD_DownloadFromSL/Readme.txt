@@ -1,0 +1,1 @@
+This skin applier HUD was created from prims in Second Life then downloaded as a DAE. So there is no blender file for it.

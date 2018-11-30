@@ -1,12 +1,12 @@
 License terms for this project vary by part type.  Please do not delete any credits or license files that are included in this project.   Built with Blender 2.79 with Avastar 2.3-2 Bento and Avastar 2.4-1 Bento.
 
-Ruth Too is derived from Ruth 2.0 RC3. All licensing is the same as Ruth 2.0.
+Ruth Too RC3 is derived from Ruth 2.0 RC#3. All licensing is the same as Ruth 2.0.
 
-Ruth Too is created by Sean Heavy from a modified Ruth 2.0 RC3. The Ruth Too body has the same mesh and weight painting as Ruth Too RC3; so all Ruth 2.0 RC3 clothing and add-ons should fit the same.
+Ruth Too RC3 is created by Sean Heavy from a modified Ruth 2.0 RC#3. The Ruth Too body has the same mesh and weight painting as Ruth Too RC3; so all Ruth 2.0 RC#3 clothing and add-ons should fit the same.
 
-Ruth 2.0 is by Shin Ingen, who can be found at https://mewe.com/i/shiningen 
+Ruth 2.0 RC#3 is by Shin Ingen, who can be found at https://mewe.com/i/shiningen 
 
-Ruth Too is by Sean Heavy who can be found at these social media sites:
+Ruth Too RC3 is by Sean Heavy who can be found at these social media sites:
 https://mewe.com/i/seanheavy
 https://plus.google.com/105693193051691369796
 https://twitter.com/SeanHeavy
@@ -14,7 +14,7 @@ https://twitter.com/SeanHeavy
 mailto:seanheavy@gmail.com
 
 Most of the these mesh objects can be downloaded from GitHub at:
-https://github.com/ocsean/Ruth
+https://github.com/ocsean/RuthToo
 or
 https://github.com/ingen-lab/Ruth
 
@@ -50,7 +50,7 @@ Sundance Haiku
 The mesh head is CC-BY Linden Lab.
 The UV map is CC-BY Linden Lab.
 
-Ruth Too Logo and photos CC-0 by Sean Heavy.
+Ruth Too RC3 Logo and photos CC-0 by Sean Heavy.
 
 **Skins**
 
@@ -67,12 +67,3 @@ Pleaides Skin by Eloh Eliot is BSD License--this covers both source files and in
 StarLight Skin, Strawberry Mods by Eloh Eliot is MIT License--this covers both source files and in-world skins.
 
 Ghana Skin is CC-BY Ina Centaur. 
-
-**Attachments**
-
-...
-
-**Clothing**
-
-...
-

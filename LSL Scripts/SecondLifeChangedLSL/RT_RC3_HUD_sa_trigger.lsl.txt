@@ -1,0 +1,260 @@
+// RT_RC3_HUD_sa_trigger.lsl
+
+//*********************************************************************************    
+//**   Copyright (C) 2017  Shin Ingen
+//**   Heavily modified by Sean Heavy
+//**
+//**   This program is free software: you can redistribute it and/or modify
+//**   it under the terms of the GNU Affero General Public License as
+//**   published by the Free Software Foundation, either version 3 of the
+//**   License, or (at your option) any later version.
+//**
+//**   This program is distributed in the hope that it will be useful,
+//**   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//**   GNU Affero General Public License for more details.
+//**
+//**   You should have received a copy of the GNU Affero General Public License
+//**   along with this program.  If not, see <https://www.gnu.org/licenses/>
+//*********************************************************************************    
+
+// Set debug_on_1 to 1 if you want to get debug info
+integer debug_on_1 = 0;
+// Set set_textures_on_1 to 1 to assign textures to buttons according to new config file
+integer set_textures_on_1 = 0;
+//
+integer r2chan; //Channel that HUD uses to speak to Ruth 
+integer appID = 20181024; //Combines to create unique channel
+//Config file variables
+key kQuery;
+integer iLine = 0;
+string notecard_name = "Configuration";
+key notecard_key = NULL_KEY;
+string configJSONList = "{ \"button0\":\"0-0-0-0-0\"";
+
+//Function used to ignore comments in config file
+integer like(string value, string mask) {
+    integer tmpy = (llGetSubString(mask,  0,  0) == "%") | ((llGetSubString(mask, -1, -1) == "%") << 1);
+    if(tmpy) mask = llDeleteSubString(mask, (tmpy / -2), -(tmpy == 2));
+ 
+    integer tmpx = llSubStringIndex(value, mask);
+    if(~tmpx) {
+        integer diff = llStringLength(value) - llStringLength(mask);
+        return  ((!tmpy && !diff)
+             || ((tmpy == 1) && (tmpx == diff))
+             || ((tmpy == 2) && !tmpx)
+             ||  (tmpy == 3));
+    }
+    return FALSE;
+}
+
+//Read config file NOT needed anymore. Done by button
+config_init() {
+    //key nc_key = llGetInventoryKey(notecard_name);
+    //if (nc_key == notecard_key) {
+    //    // Some other inventory item changed, not the configuration notecard.
+    //    return; // Skip reading the notecard in this case.
+    //}
+    //// Remember the new notecard key from now on.
+    //notecard_key = nc_key;
+    //iLine = 0;
+    //kQuery = llGetNotecardLine(notecard_name, iLine);
+}
+
+integer keyapp2chan() {
+    return 0x80000000 | ((integer)("0x"+(string)llGetOwner()) ^ appID);
+}
+//tglOnColor is the highlight color for a skin button you are using /green?
+vector         tglOnColor = <0.000, 1.000, 0.000>;
+//tglOffColor undoes the highlight color, usually just white
+vector        tglOffColor = <1.000, 1.000, 1.000>;
+
+// This is a list of button names and their link number
+// buttonNameList [ buttonLink#, buttonName ]
+list    buttonNameList =    [
+//dummie buttons
+"0::button00", "1::button00",
+//row 1 buttons
+"2::button1", "3::button2", "4::button3", "5::button4", "6::button5", "7::button6",
+//row 2 buttons
+"8::button7", "9::button8", "10::button9", "11::button10", "12::button11", "13::button12",
+//row 3 buttons
+"14::button13", "15::button14", "16::button15", "17::button16", "18::button17", "19::button18",
+//row 4 buttons
+"20::button19", "21::button20", "22::button21", "23::button22", "24::button23", "25::button24",
+//row 5 buttons
+"26::button25", "27::button26", "28::button27", "29::button28", "30::button29", "31::button30",
+//right column
+"32::button31", "33::button32", "34::button33", "35::button34", "36::button35"
+//end
+]; 
+
+// unhighlight buttons not currently active
+ToggleOff(integer i,integer x,integer l,string flagDesc) {
+    for (; i < x; ++i) {
+        if (i != l) {
+            list linkParamList = llGetLinkPrimitiveParams(i,[PRIM_DESC]);
+            string primDesc = llList2String(linkParamList,0);
+            if (primDesc == flagDesc) {
+                llSetLinkPrimitiveParamsFast(i, [PRIM_COLOR, ALL_SIDES, tglOffColor, 1.0]);
+            }
+        }
+    }
+}
+
+resetTexturesOnPrims () {
+    integer i = 2; // 2 is link # of first button
+    integer x = llGetListLength(buttonNameList);
+    for (; i < x; ++i) { // set texture on each button
+        // Get button name based on link number from list above
+        string dataString = llList2String(buttonNameList,i);
+        list stringList = llParseString2List(dataString, ["::"], []);
+        integer buttonLink = llList2Integer(stringList,0);
+        string buttonName = llList2String(stringList,1);
+        // Prep button name for parameter to llJsonGetValue call
+        string buttonName4List = buttonName + "::";
+        if (debug_on_1 == 1) llOwnerSay("buttonName=" + buttonName);
+        if (debug_on_1 == 1) llOwnerSay("buttonName4List=" + buttonName4List);
+        //Now create list of buttonName for call
+        list JsonSpec = llParseString2List(buttonName4List,["::"],[]);
+        if (debug_on_1 == 1) llOwnerSay("JsonSpec=" + llList2String(JsonSpec,0));
+        // This is the texture key for applying to Ruth
+        string primTexture = llJsonGetValue(configJSONList, JsonSpec);
+        //string primTexture = llJsonGetValue(configJSONList, ["button27"]);
+        if (debug_on_1 == 1) llOwnerSay("primTexture=" + primTexture);
+        // Assign texture to appropriate prim
+        llSetLinkTexture( buttonLink, (key)primTexture, ALL_SIDES );
+        if (debug_on_1 == 1)  {
+            string message = "buttonLink: " + (string)buttonLink + ", primTexture: " + primTexture + "\n\n\n";
+            llOwnerSay(message);
+        }
+    }
+    llOwnerSay("Textures on buttons done.");
+}
+
+default {
+    state_entry() {
+        //Create communication channel for Ruth
+        r2chan = keyapp2chan(); // channel on which to communicate
+        if (debug_on_1 == 1) {
+            llOwnerSay("\n\n\nr2chan=" + (string)r2chan + "\n");
+        }
+        // Need to read config file or skins won't work
+        llOwnerSay("Reading Config File");
+        kQuery = llGetNotecardLine(notecard_name, iLine);
+    } //end of state entry
+
+    on_rez(integer param) {
+        llResetScript();
+        // Need to read config file or skins won't work
+        llOwnerSay("Reading Config File");
+        kQuery = llGetNotecardLine(notecard_name, iLine);
+    }
+
+//    //Check for a changed config file
+//    changed(integer change) {
+//        if (change & CHANGED_INVENTORY) {
+//            // Read the notecard when the inventory has changed.
+//            config_init();
+//        }
+//    }
+
+    // This is where the config file is processed
+    dataserver(key query_id, string data) {
+        if (query_id == kQuery) {
+            // this is a line of our config file (notecard)
+            if (data == EOF) {
+                configJSONList = configJSONList + " }";
+                llOwnerSay("Finished reading configuration.");
+                // If textures on prims need resetting,
+                // gotta be here to wait for config read to finish
+                // Set textures on prims according to config file
+                if (set_textures_on_1 == 1) resetTexturesOnPrims();
+
+                if (debug_on_1) {
+                    llOwnerSay("button4=" + llJsonGetValue(configJSONList, ["button4"]));
+                    llOwnerSay("button10=" + llJsonGetValue(configJSONList, ["button10"]));
+                    llOwnerSay("button15=" + llJsonGetValue(configJSONList, ["button15"]));
+                    llOwnerSay("button22=" + llJsonGetValue(configJSONList, ["button22"]));
+                    llOwnerSay("button31=" + llJsonGetValue(configJSONList, ["button31"]));
+                    llOwnerSay("button35=" + llJsonGetValue(configJSONList, ["button35"]));
+                }
+                if (debug_on_1) llOwnerSay("\n\njson list=" + configJSONList + "\n\n");
+            } else {
+                // Process each line of config file
+                if (like(data, "//%") ) { //Check for comment "//"
+                    if (debug_on_1) llOwnerSay("Skipped comment.");
+                } else { //Not a comment, process
+                    //Get each value from each line of config file
+                    list stringList = llParseString2List(data, [":"], []);
+                    string buttonName = llList2String(stringList,0);
+                    key textureKey = llList2Key(stringList,1);
+                    string addToConfigJsonList = ", \"" + buttonName + "\":\"" + (string)textureKey + "\"";
+                    configJSONList = configJSONList + addToConfigJsonList;
+                }
+
+                // increment line count
+                ++iLine;
+                //request next line of notecard.
+                kQuery = llGetNotecardLine(notecard_name, iLine);
+            }
+        }
+    }
+
+    // Now process mouse clicks on HUD
+    touch_start(integer num_detected) {
+        if (llDetectedKey(0) == llGetOwner()) {
+            integer i; //1 is always the rootprim of a linkset
+            integer x = llGetNumberOfPrims() + 1; //number of iterations
+            integer l = llDetectedLinkNumber(0);
+
+            //buttonNameList [ buttonLink#, buttonName ]
+            string dataString = llList2String(buttonNameList,l);
+            if (debug_on_1 == 1) llOwnerSay("l:" + (string)l + ", dataString: " + dataString + ".\n");
+            //Get specific button name clicked on
+            list stringList = llParseString2List(dataString, ["::"], []);
+            //buttonName is used to get texture key from config file
+            string buttonName = llList2String(stringList,1);
+            //Check for Set HUD Textures button
+            if ( buttonName == "button35" ) {
+                llOwnerSay("Setting HUD Textures to config file");
+                resetTexturesOnPrims();
+                return;
+            }
+            //Check for Read Config File button
+            if ( buttonName == "button34" ) {
+                llOwnerSay("Reading Config File");
+                kQuery = llGetNotecardLine(notecard_name, iLine);
+                //resetTexturesOnPrims();
+                return;
+            }
+            // Check for unused buttons
+            if (buttonName == "button31" || buttonName == "button32" || buttonName == "button33" ) {
+                llOwnerSay("Extra buttons not implemented yet");
+                return;
+            }
+            if (debug_on_1 == 1) llOwnerSay("buttonName=" + buttonName + ".");
+            string buttonName4List = buttonName + "::";
+            if (debug_on_1 == 1) llOwnerSay("buttonName4List=" + buttonName4List + ".");
+            list JsonSpec = llParseString2List(buttonName4List,["::"],[]);
+            if (debug_on_1 == 1) llOwnerSay("JsonSpec=" + llList2String(JsonSpec,0) + ".");
+            // This is the texture key for applying to Ruth
+            string primTexture = llJsonGetValue(configJSONList, JsonSpec);
+            //string primTexture = llJsonGetValue(configJSONList, ["button27"]);
+
+            //Need details of prim clicked on to determine head/lower/upper/etc
+            list linkParamList = llGetLinkPrimitiveParams(l,[PRIM_DESC]);
+            string primDesc = llList2String(linkParamList,0);
+
+            if (l!=1 && l!=0) { //1 is root prim, zero not a prim, all not a button 
+                // Set highlight color on this button
+                llSetLinkPrimitiveParamsFast(l, [PRIM_COLOR, ALL_SIDES, tglOnColor, 1.0]);
+                // Turn off highlight color for non used button
+                ToggleOff(i,x,l,primDesc);
+                string message = "TEXTURE," + primDesc  + "," + primTexture;
+                llSay(r2chan, message);
+                if (debug_on_1 == 1) llOwnerSay("Command To Ruth:" + message);
+            }
+        }
+    }
+}

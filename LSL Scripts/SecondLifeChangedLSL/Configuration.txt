@@ -1,0 +1,56 @@
+//Setup for using JSon values "key:val"
+//Button#:TextureUUIDKey
+//
+//row 1 buttons left to right
+button1:7c6d74b2-1f37-0b1d-6c43-7e993c75511e
+button2:384100dc-2862-96e2-f278-e8426449a1c3
+button3:7bd76133-74d3-0df3-3954-95c28b2ae99f
+button4:3229590b-605b-cc67-756a-9d2b1259b29e
+button5:384100dc-2862-96e2-f278-e8426449a1c3
+button6:4a6e03c8-6427-f6b4-099d-af6c871a598c
+//
+//row 2 buttons left to right
+button7:1040f037-a06d-b7d3-7666-48f985543bf6
+button8:b3b564cc-7625-c34a-8e41-34c39a5830d6
+button9:8056389f-2504-218e-96b0-0fee1c2dd921
+button10:e4ac20dd-84bb-04fc-cf3a-85b712126b14
+button11:b3b564cc-7625-c34a-8e41-34c39a5830d6
+button12:2516fc9e-a73f-c74f-ef51-63a3e7bde1a4
+//
+//row 3 buttons left to right
+button13:22768b3c-9d94-01fa-b540-cf9147abe9ba
+button14:ba809a4d-4e9a-9899-ff8e-c5ccfb8bc4c4
+button15:9893382f-ebe6-2631-c7a4-6a4e33a07657
+button16:4be8234a-0ce6-f690-2bdc-92cde1cea8fc
+button17:ba809a4d-4e9a-9899-ff8e-c5ccfb8bc4c4
+button18:44d24a22-25de-ee95-c028-5b8ab02e4acc
+//
+//row 4 buttons left to right
+button19:89562ff7-9ade-aa30-35a3-5704ff14bd0d
+button20:c9227b6e-2049-1714-4c91-f76d88f82a31
+button21:3b326c42-d551-eb4b-be7e-007e19c08c13
+button22:543fce58-ce4e-64cd-2715-1eb3555940b0
+button23:c9227b6e-2049-1714-4c91-f76d88f82a31
+button24:2dd6a56b-1212-e43d-f792-9b2478699c62
+//
+//row 5 buttons left to right
+button25:d38e0e8f-8cc4-8beb-a66f-db4a2d2b048f
+button26:a53f35cb-9001-ec56-5411-44c2cdfadd8b
+button27:c86dfac4-58b2-38f8-1852-405b8aacfbba
+button28:e5d3b4ed-ba77-b65a-ec50-9251cb867e81
+button29:7387974b-6b58-e149-f33d-4e257ef6b985
+button30:4d41a20b-6ad3-69bd-30d7-9688e491af87
+//
+//right column top to bottom
+// UNUSED for now
+// maybe future use for eye textures or fingernail colors?
+button31:5748decc-f629-461c-9a36-a35a221fe21f
+button32:5748decc-f629-461c-9a36-a35a221fe21f
+button33:5748decc-f629-461c-9a36-a35a221fe21f
+//
+// Read Config File
+button34:e17c0434-7ce6-a027-dd3c-aafb7d937b73
+// Set HUD textures to config file
+button35:2611b487-b991-9e07-f8c1-4cdc95ccf682
+//
+//END
