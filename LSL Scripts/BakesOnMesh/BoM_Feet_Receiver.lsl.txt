@@ -1,0 +1,93 @@
+// BoM_Feet_Receiver.lsl
+// Assigns Bakes on Mesh texture to Feet
+//*********************************************************************************    
+//**   Copyright (C) 2017  Shin Ingen
+//**
+//**   This program is free software: you can redistribute it and/or modify
+//**   it under the terms of the GNU Affero General Public License as
+//**   published by the Free Software Foundation, either version 3 of the
+//**   License, or (at your option) any later version.
+//**
+//**   This program is distributed in the hope that it will be useful,
+//**   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//**   GNU Affero General Public License for more details.
+//**
+//**   You should have received a copy of the GNU Affero General Public License
+//**   along with this program.  If not, see <https://www.gnu.org/licenses/>
+//*********************************************************************************    
+// Set debug_on_1 to 1 if you want to get debug info
+integer debug_on_1 = 0;
+//integer debug_on_1 = 1;
+integer r2chan;
+integer appID = 20181024;
+integer whichFace = 0;
+integer keyapp2chan() {
+    return 0x80000000 | ((integer)("0x"+(string)llGetOwner()) ^ appID);
+}
+default {
+    state_entry() {
+        r2chan = keyapp2chan();
+//        r2chan = 0;
+        llListen(r2chan,"","","");
+        llRequestPermissions(llGetOwner(), PERMISSION_TRIGGER_ANIMATION);
+    }
+    on_rez(integer param) {
+        llResetScript();
+        llRequestPermissions(llGetOwner(), PERMISSION_TRIGGER_ANIMATION);
+    }
+    run_time_permissions(integer perm) {
+        if (perm & PERMISSION_TRIGGER_ANIMATION) {
+            llStopAnimation("bentohandrelaxedP1");
+            llStartAnimation("bentohandrelaxedP1");
+            llSetTimerEvent(3);
+        }
+    }
+    timer() {
+        llSetTimerEvent(0);
+        llRequestPermissions(llGetOwner(), PERMISSION_TRIGGER_ANIMATION);
+    }
+    listen(integer channel,string name,key id,string message) {
+        if (llGetOwnerKey(id) == llGetOwner()) {
+            if (channel == r2chan) {
+                list msglist = llParseString2List(message, [","], []);
+                integer listLenght = llGetListLength(msglist);
+                if (debug_on_1 == 1) llOwnerSay("message lenght:"+ (string)listLenght);
+                if (debug_on_1 == 1) llOwnerSay("message received:"+ llList2String(msglist,0) + "; " + llList2String(msglist,1) + "; " + llList2String(msglist,2));
+                if (listLenght >= 3) {
+                    string command = llToUpper(llList2String(msglist, 0));
+                    if (command == "TEXTURE") {
+                        string descflag = llStringTrim(llToUpper(llList2String(msglist, 1)), STRING_TRIM);
+                        string textureid = llList2String(msglist, 2);
+                        integer i;
+                        integer x = llGetNumberOfPrims()+1;
+                        whichFace = ALL_SIDES; // For setting entire upper/lower
+                        if (descflag == "LEFTLEG") {
+                            if (debug_on_1 == 1) llOwnerSay("Setting whichFace to zero. descflag to LOWER");
+                            whichFace = 0;      // For setting only the left leg.
+                            descflag = "LOWER";  // left leg is in lower section.
+                        } else if (descflag == "LEFTARM") {
+                            if (debug_on_1 == 1) llOwnerSay("Setting whichFace to zero. descflag to UPPER");
+                            whichFace = 0;      // For setting only the left arm.
+                            descflag = "UPPER";  // left arm is in upper section.
+                        }
+                        for (; i < x; ++i) {
+                            list paramlist = llGetObjectDetails(llGetLinkKey(i), [OBJECT_DESC,OBJECT_NAME]);
+                            string objdesc = llToUpper(llList2String(paramlist,0));
+                            string objname = llList2String(paramlist,1);
+                            if (debug_on_1 == 1) llOwnerSay("DescFlag="+descflag+", ObjDesc="+objdesc+", TextureID="+textureid);
+                            if (objdesc == descflag) {
+                                // Face one of the feet is the LeftLeg
+                                // Face zero of the feet is the RightLeg
+                                llSetLinkPrimitiveParamsFast(i, [PRIM_TEXTURE, whichFace, textureid, <1,1,0>, <0,0,0>, 0]);
+                                if (debug_on_1 == 1) llOwnerSay("Changed " + objname + " texture and face:" + (string)whichFace + ".");
+                            }
+                        }
+                    } else if (command == "ALPHA") {
+                        llOwnerSay("This Bakes on Mesh RuthTooRC3 Does Not Have ALPHA-CUTS.\n Please use Alpha Wearables.");
+                    }
+                }
+            }
+        }
+    }
+}

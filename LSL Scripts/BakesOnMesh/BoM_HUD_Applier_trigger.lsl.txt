@@ -1,0 +1,224 @@
+// BoM_HUD_Applier_trigger.lsl
+//*********************************************************************************    
+//**   Copyright (C) 2017  Shin Ingen
+//**   Heavily modified by Sean Heavy for Bakes on Mesh
+//**
+//**   This program is free software: you can redistribute it and/or modify
+//**   it under the terms of the GNU Affero General Public License as
+//**   published by the Free Software Foundation, either version 3 of the
+//**   License, or (at your option) any later version.
+//**
+//**   This program is distributed in the hope that it will be useful,
+//**   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//**   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//**   GNU Affero General Public License for more details.
+//**
+//**   You should have received a copy of the GNU Affero General Public License
+//**   along with this program.  If not, see <https://www.gnu.org/licenses/>
+//*********************************************************************************    
+// Set debug_on_1 to 1 if you want to get debug info
+integer debug_on_1 = 0;
+// Set set_textures_on_1 to 1 to assign textures to buttons according to new config file
+integer set_textures_on_1 = 0;
+//
+integer r2chan; //Channel that HUD uses to speak to Ruth 
+integer appID = 20181024; //Combines to create unique channel
+//Config file variables
+key kQuery;
+integer iLine = 0;
+string notecard_name = "Configuration";
+key notecard_key = NULL_KEY;
+string configJSONList = "{ \"button0\":\"0-0-0-0-0\"";
+
+//Function used to ignore comments in config file
+integer like(string value, string mask) {
+    integer tmpy = (llGetSubString(mask,  0,  0) == "%") | ((llGetSubString(mask, -1, -1) == "%") << 1);
+    if(tmpy) mask = llDeleteSubString(mask, (tmpy / -2), -(tmpy == 2));
+ 
+    integer tmpx = llSubStringIndex(value, mask);
+    if(~tmpx) {
+        integer diff = llStringLength(value) - llStringLength(mask);
+        return  ((!tmpy && !diff)
+             || ((tmpy == 1) && (tmpx == diff))
+             || ((tmpy == 2) && !tmpx)
+             ||  (tmpy == 3));
+    }
+    return FALSE;
+}
+
+integer keyapp2chan() {
+    return 0x80000000 | ((integer)("0x"+(string)llGetOwner()) ^ appID);
+}
+
+// This is a list of button names and their link number
+// buttonNameList [ buttonLink#, buttonName ]
+list    buttonNameList =    [
+//dummie buttons
+"0::button00", "1::button00",
+//row 1 buttons
+"2::button1", "3::button2", "4::button3", "5::button4", "6::button5", "7::button6",
+"8::info1", "9::info2", "10::info3", "11::info4", "12::info5", "13::info6"
+//end
+]; 
+
+resetTexturesOnPrims () {
+    integer i = 2; // 2 is link # of first button
+    integer x = llGetListLength(buttonNameList) - 2;
+    for (; i < x; ++i) { // set texture on each button
+        // Get button name based on link number from list above
+        string dataString = llList2String(buttonNameList,i);
+        list stringList = llParseString2List(dataString, ["::"], []);
+        integer buttonLink = llList2Integer(stringList,0);
+        string buttonName = llList2String(stringList,1);
+        // Prep button name for parameter to llJsonGetValue call
+        string buttonName4List = buttonName + "::";
+        if (debug_on_1 == 1) llOwnerSay("buttonName=" + buttonName);
+        if (debug_on_1 == 1) llOwnerSay("buttonName4List=" + buttonName4List);
+        //Now create list of buttonName for call
+        list JsonSpec = llParseString2List(buttonName4List,["::"],[]);
+        //llOwnerSay("JsonSpec=" + llList2String(JsonSpec,0));
+        // This is the texture key for applying to Ruth
+        string primTexture = llJsonGetValue(configJSONList, JsonSpec);
+        //string primTexture = llJsonGetValue(configJSONList, ["button27"]);
+        //llOwnerSay("primTexture=" + primTexture);
+        // Assign texture to appropriate prim
+        llSetLinkTexture( buttonLink, (key)primTexture, ALL_SIDES );
+        if (debug_on_1 == 1)  {
+            string message = "buttonLink: " + (string)buttonLink + ", primTexture: " + primTexture + "\n\n\n";
+            llOwnerSay(message);
+        }
+        //string message = "buttonLink: " + (string)buttonLink + ", primTexture: " + primTexture + "\n\n\n";
+        //llOwnerSay(message);
+    }
+    llOwnerSay("Textures on buttons done.");
+}
+
+default {
+    state_entry() {
+        //Create communication channel for Ruth
+        r2chan = keyapp2chan(); // channel on which to communicate
+        if (debug_on_1 == 1) {
+            llOwnerSay("\n\n\nr2chan=" + (string)r2chan + "\n");
+        }
+        llOwnerSay("Click on square buttons below labels to set each of those body parts to Bakes On Mesh.");
+        llOwnerSay("To remove the \"Baked LeftArm\" and/or \"Baked LeftLeg\" click on the square box below labels: \"Baked Upper\" and/or \"Baked Lower\".");
+        // Need to read config file or skins won't work
+        llOwnerSay("Reading Config File");
+        kQuery = llGetNotecardLine(notecard_name, iLine);
+    } //end of state entry
+
+    on_rez(integer param) {
+        llResetScript();
+        llOwnerSay("Click on square buttons below labels to set each of those body parts to Bakes On Mesh.");
+        llOwnerSay("To remove the \"Baked LeftArm\" and/or \"Baked LeftLeg\" click on the square box below labels: \"Baked Upper\" and/or \"Baked Lower\".");
+        // Need to read config file or skins won't work
+        llOwnerSay("Reading Config File");
+        kQuery = llGetNotecardLine(notecard_name, iLine);
+    }
+
+    // This is where the config file is processed
+    dataserver(key query_id, string data) {
+        if (query_id == kQuery) {
+            // this is a line of our config file (notecard)
+            if (data == EOF) {
+                configJSONList = configJSONList + " }";
+                llOwnerSay("Finished reading configuration.");
+                // If textures on prims need resetting,
+                // gotta be here to wait for config read to finish
+                // Set textures on prims according to config file
+                if (set_textures_on_1 == 1) resetTexturesOnPrims();
+
+                if (debug_on_1) {
+                    llOwnerSay("button1=" + llJsonGetValue(configJSONList, ["button1"]));
+                    llOwnerSay("button2=" + llJsonGetValue(configJSONList, ["button2"]));
+                    llOwnerSay("button3=" + llJsonGetValue(configJSONList, ["button3"]));
+                    llOwnerSay("button4=" + llJsonGetValue(configJSONList, ["button4"]));
+                    llOwnerSay("button5=" + llJsonGetValue(configJSONList, ["button5"]));
+                    llOwnerSay("button6=" + llJsonGetValue(configJSONList, ["button6"]));
+                }
+                if (debug_on_1) llOwnerSay("\n\njson list=" + configJSONList + "\n\n");
+            } else {
+                // Process each line of config file
+                if (like(data, "//%") ) { //Check for comment "//"
+                    if (debug_on_1) llOwnerSay("Skipped comment.");
+                } else { //Not a comment, process
+                    //Get each value from each line of config file
+                    list stringList = llParseString2List(data, [":"], []);
+                    string buttonName = llList2String(stringList,0);
+                    key textureKey = llList2Key(stringList,1);
+                    string addToConfigJsonList = ", \"" + buttonName + "\":\"" + (string)textureKey + "\"";
+                    configJSONList = configJSONList + addToConfigJsonList;
+                }
+
+                // increment line count
+                ++iLine;
+                //request next line of notecard.
+                kQuery = llGetNotecardLine(notecard_name, iLine);
+            }
+        }
+    }
+
+    // Now process mouse clicks on HUD
+    touch_start(integer num_detected) {
+        if (llDetectedKey(0) == llGetOwner()) {
+            integer i; // 1 is always the rootprim of a linkset
+            integer x = llGetNumberOfPrims() + 1; //number of iterations
+            integer l = llDetectedLinkNumber(0);
+
+            //buttonNameList [ buttonLink#, buttonName ]
+            string dataString = llList2String(buttonNameList,l);
+            if (debug_on_1 == 1) llOwnerSay("l:" + (string)l + ", dataString: " + dataString + ".\n");
+            //Get specific button name clicked on
+            list stringList = llParseString2List(dataString, ["::"], []);
+            //buttonName is used to get texture key from config file
+            string buttonName = llList2String(stringList,1);
+            if (buttonName == "info1") {
+                llOwnerSay("This is the label for Bakes on Mesh HEAD");
+                return;
+            } else if (buttonName == "info2") {
+                llOwnerSay("This is the label for Bakes on Mesh UPPER");
+                llOwnerSay("If you set Baked Upper, it will make all of the upper to BAKED_UPPER.");
+                llOwnerSay("You will have to reset Baked LeftArm if wanted");
+                return;
+            } else if (buttonName == "info3") {
+                llOwnerSay("This is the label for Bakes On Mesh LOWER");
+                llOwnerSay("If you set Baked Lower, it will make all of the lower to BAKED_LOWER.");
+                llOwnerSay("You will have to reset Baked LeftLeg if wanted");
+                return;
+            } else if (buttonName == "info4") {
+                llOwnerSay("This is the label for Bakes on Mesh EYES");
+                llOwnerSay("Wear a classic eye body-part to change your eye color.");
+                return;
+            } else if (buttonName == "info5") {
+                llOwnerSay("This is the label for Bakes on Mesh LEFTARM");
+                llOwnerSay("If you set Baked LeftArm, be sure to wear a specific LeftArm wearable or your left arm will be gray.");
+                llOwnerSay("To remove the \"Baked LeftArm\" click on the square box below label: \"Baked Upper\".");
+                return;
+            } else if (buttonName == "info6") {
+                llOwnerSay("This is the label for Bakes on Mesh LEFTLEG");
+                llOwnerSay("If you set Baked LeftLeg, be sure to wear a specific LeftLeg wearable or your left leg will be gray.");
+                llOwnerSay("To remove the \"Baked LeftLeg\" click on the square box below label: \"Baked Lower\".");
+                return;
+            }
+            //Check for Set HUD Textures button
+            if (debug_on_1 == 1) llOwnerSay("buttonName=" + buttonName + ".");
+            string buttonName4List = buttonName + "::";
+            if (debug_on_1 == 1) llOwnerSay("buttonName4List=" + buttonName4List + ".");
+            list JsonSpec = llParseString2List(buttonName4List,["::"],[]);
+            if (debug_on_1 == 1) llOwnerSay("JsonSpec=" + llList2String(JsonSpec,0) + ".");
+            // This is the texture key for applying to Ruth
+            string primTexture = llJsonGetValue(configJSONList, JsonSpec);
+            //string primTexture = llJsonGetValue(configJSONList, ["button2"]);
+
+            //Need details of prim clicked on to determine head/lower/upper/etc
+            list linkParamList = llGetLinkPrimitiveParams(l,[PRIM_DESC]);
+            string primDesc = llList2String(linkParamList,0);
+
+            if (l!=1 && l!=0) { //1 is root prim, zero not a prim, all not a button 
+                string message = "TEXTURE," + primDesc  + "," + primTexture;
+                llSay(r2chan, message);
+                if (debug_on_1 == 1) llOwnerSay("Command To Ruth:" + message);
+            }
+        }
+    }
+}
